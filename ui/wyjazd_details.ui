@@ -22,6 +22,15 @@ QComboBox {
 	color:black;
 }
 
+QComboBox::item{
+	color: black;
+}
+
+QComboBox QAbstractItemView {
+        color: black;  /* Kolor czcionki dla elementów rozwijanej listy */
+		 /* Kolor tła dla elementów rozwijanej listy */
+    }
+
 QPushButton#closeBtn{
 	color: black;
 }
