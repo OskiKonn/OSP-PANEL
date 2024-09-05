@@ -105,7 +105,4 @@
 
     pg_close($connection);
 
-
-
-
 ?>

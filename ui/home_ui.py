@@ -1,4 +1,4 @@
-# Form implementation generated from reading ui file 'c:\Users\oskar\OneDrive\Pulpit\Stuff\OSP_KM_SYS\ui\home.ui'
+# Form implementation generated from reading ui file 'c:\Users\oskar\OneDrive\Pulpit\Stuff\OSP-PANEL\ui\home.ui'
 #
 # Created by: PyQt6 UI code generator 6.7.1
 #

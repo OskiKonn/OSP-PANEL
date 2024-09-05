@@ -1,4 +1,4 @@
-# Form implementation generated from reading ui file 'c:\Users\oskar\OneDrive\Pulpit\Stuff\OSP_KM_SYS\ui\login.ui'
+# Form implementation generated from reading ui file 'c:\Users\oskar\OneDrive\Pulpit\Stuff\OSP-PANEL\ui\login.ui'
 #
 # Created by: PyQt6 UI code generator 6.7.1
 #
@@ -20,7 +20,7 @@ class Ui_MainWindow(object):
         MainWindow.setSizePolicy(sizePolicy)
         MainWindow.setMinimumSize(QtCore.QSize(0, 0))
         icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap("c:\\Users\\oskar\\OneDrive\\Pulpit\\Stuff\\OSP_KM_SYS\\ui\\../assets/logo.jpg"), QtGui.QIcon.Mode.Normal, QtGui.QIcon.State.Off)
+        icon.addPixmap(QtGui.QPixmap("c:\\Users\\oskar\\OneDrive\\Pulpit\\Stuff\\OSP-PANEL\\ui\\../assets/logo.jpg"), QtGui.QIcon.Mode.Normal, QtGui.QIcon.State.Off)
         MainWindow.setWindowIcon(icon)
         self.centralwidget = QtWidgets.QWidget(parent=MainWindow)
         self.centralwidget.setObjectName("centralwidget")
@@ -34,7 +34,7 @@ class Ui_MainWindow(object):
         self.logo = QtWidgets.QLabel(parent=self.logoFrame)
         self.logo.setGeometry(QtCore.QRect(264, 20, 191, 201))
         self.logo.setText("")
-        self.logo.setPixmap(QtGui.QPixmap("c:\\Users\\oskar\\OneDrive\\Pulpit\\Stuff\\OSP_KM_SYS\\ui\\../assets/logo.jpg"))
+        self.logo.setPixmap(QtGui.QPixmap("c:\\Users\\oskar\\OneDrive\\Pulpit\\Stuff\\OSP-PANEL\\ui\\../assets/logo.jpg"))
         self.logo.setScaledContents(True)
         self.logo.setObjectName("logo")
         self.verticalLayout.addWidget(self.logoFrame, 0, QtCore.Qt.AlignmentFlag.AlignHCenter)
