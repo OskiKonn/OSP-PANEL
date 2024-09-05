@@ -8,7 +8,7 @@ from colorama import Fore, init # colored prints lib
 class AppState():
     def __init__(self, app=None):
         print(f"{Fore.GREEN}AppState loaded{Fore.RESET}")
-        print("Nice")
+        print("Nice push")
 
         if app is None:
             app = qtw.QMainWindow
