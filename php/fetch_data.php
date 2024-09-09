@@ -4,18 +4,8 @@
     header('Content-Type: application/json');
 
     // Connection parameters
-    $host = "localhost";
-    $database = "OSP_GRUDZIADZ";
-    $user = "postgres";
-    $dbpassword = "OskarKonrad2";
-    $port = "5432";
-
-    $connection = pg_connect("host=$host port=$port dbname=$database user=$user password=$dbpassword");
-
-    if (!$connection) {
-        die("Error: Could not connect to a database" . pg_last_error());
-    }
-
+    require_once("connect.php");
+    $connection = connect();
     $table = $_POST['table'];
     $mode = $_POST['mode'];
     $params = [];

@@ -2,13 +2,8 @@
 <?php
 
     // Connection parameters
-    $host = "localhost";
-    $database = "OSP_GRUDZIADZ";
-    $user = "postgres";
-    $dbpassword = "OskarKonrad2";
-    $port = "5432";
-
-    $connection = pg_connect("host=$host port=$port dbname=$database user=$user password=$dbpassword");
+    require_once("connect.php");
+    $connection = connect();
 
     if (!$connection) {
         die("Error: Could not connect to a database" . pg_last_error());
