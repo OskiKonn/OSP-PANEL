@@ -21,11 +21,14 @@
             if ($mode == 'detail') {
                 $id = $_POST['id'];
                 $params[] = $id; // Adds target id to parameters table
-                $query = "  SELECT w.title, w.number, w.type, w.adress, w.day, cc.name || ' ' || cc.surname as commander,
-                                cd.name || ' ' || cd.surname as driver, c1.name || ' ' || c1.surname as ratownik1,
-                                c2.name || ' ' || c2.surname as ratownik2, c3.name || ' ' || c3.surname as ratownik3,
-                                c4.name || ' ' || c4.surname as ratownik4, w.alarm, w.arrival, w.departure,
-                                w.comeback
+                $query = "  SELECT w.title, w.number, w.type, w.adress, w.day,
+                                cc.name || ' ' || cc.surname as commander,
+                                cd.name || ' ' || cd.surname as driver,
+                                c1.name || ' ' || c1.surname as ratownik1,
+                                c2.name || ' ' || c2.surname as ratownik2,
+                                c3.name || ' ' || c3.surname as ratownik3,
+                                c4.name || ' ' || c4.surname as ratownik4, 
+                                w.alarm, w.arrival, w.departure, w.comeback
                             from wyjazdy w
                                 JOIN czlonkowie as cc on w.commander=cc.czlonek_id
                                 LEFT JOIN czlonkowie as cd on w.driver=cd.czlonek_id
@@ -54,7 +57,7 @@
             break;
         case 'czlonkowie':
 
-            $query_fighters = "SELECT name || ' ' ||surname as czlonek FROM czlonkowie;";
+            $query_fighters = "SELECT name || ' ' || surname || ',' || czlonek_id as czlonek FROM czlonkowie;";
             $get_fighters = pg_query($connection, $query_fighters);
 
             if (!$get_fighters) {
@@ -66,8 +69,8 @@
             fetch_rows($get_fighters, $fighters);
 
             if ($mode == 'detail') {
-                $query_commanders = "SELECT name || ' ' || surname as commander_name FROM czlonkowie where is_commander;";
-                $query_drivers = "SELECT name || ' ' || surname as driver_name FROM czlonkowie where is_driver;";
+                $query_commanders = "SELECT name || ' ' || surname || ',' || czlonek_id as commander_name FROM czlonkowie where is_commander;";
+                $query_drivers = "SELECT name || ' ' || surname || ',' || czlonek_id as driver_name FROM czlonkowie where is_driver;";
 
                 $get_commanders = pg_query($connection, $query_commanders);
                 $get_drivers = pg_query($connection, $query_drivers);

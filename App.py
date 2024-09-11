@@ -6,7 +6,7 @@ from PyQt6.QtCore import QSize
 from colorama import Fore, init # color prints module
 from typing import Literal
 # Import data_model classes
-from data_model import FetchData, TableModel, ValueInjector
+from data_model import DataHandler, TableModel, ValueInjector
 # Importing Screens modules
 from screens.MainScreen import MainScreen
 from screens.HomeScreen import HomeScreen
@@ -19,7 +19,7 @@ class AppState(QMainWindow):
         print(f"{Fore.GREEN}AppState loaded{Fore.RESET}")
 
         # Creating data-fetching object
-        self.dataObject = FetchData("http://localhost")
+        self.dataObject = DataHandler("http://localhost")
 
         # Initializing Widgets
         self.MainScreen = MainScreen(self)
@@ -50,7 +50,7 @@ class AppState(QMainWindow):
             else:
                 pass
 
-            print(f"{Fore.GREEN}UI loaded succesfully - ({file}){Fore.RESET}")
+            print(f"{Fore.GREEN}UI loaded successfuly - ({file}){Fore.RESET}")
 
         except Exception as e:
             print(f"{Fore.RED}loading UI Failed - ({file})\nError: {e}{Fore.RESET}")

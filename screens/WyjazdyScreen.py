@@ -1,7 +1,7 @@
 from PyQt6.QtWidgets import QMainWindow
 from colorama import Fore
 from data_model import TableModel
-from DetailsScreen import DetailsScreen
+from screens.DetailsScreen import DetailsScreen
 
 class WyjazdyScreen(QMainWindow):
     def __init__(self, appState, parent=None):
@@ -34,6 +34,6 @@ class WyjazdyScreen(QMainWindow):
 
     def showDetails(self, index) -> None:
         id = self.model.returnId(index.row())
-        wyjazd_details = DetailsScreen(self.app_state, id)
+        wyjazd_details = DetailsScreen(self.app_state, empty=True)
         self.detail_windows.append(wyjazd_details)      # Pushes widget to a list of active widgets
         wyjazd_details.show()                           # makes it possible to have more than one opened

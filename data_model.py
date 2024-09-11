@@ -43,15 +43,15 @@ class TableModel(QAbstractTableModel):
         return self.table[index][id_index]
 
 
-class FetchData():
+class DataHandler():
     def __init__(self, base_url: str):
         self.base_url = base_url
 
-    def connect(self, script: str, post: str | dict | None = None) -> dict:
+    def connect(self, script: str, post: str | dict | None = None, no_JSON: bool = False) -> dict:
         url = f'{self.base_url}/{script}'
 
         response = requests.post(url, data=post) if post is not None else requests.get(url)
-        return response.json()
+        return response.text if no_JSON else response.json()
 
     def verify_user(self, login: str, password: str) -> bool:
         script_name = "auth.php"
@@ -96,6 +96,19 @@ class FetchData():
             print(f"{Fore.RED}Error: {e}{Fore.RESET}")
             return False, "Exception"
         
+    def send_to_db(self, section: str, data: dict) -> bool:
+        scrtipt_name = "update_table.php"
+        data['section'] = section
+        try:
+            response = self.connect(scrtipt_name, post=data, no_JSON=True)
+            if response.strip() == "Update successful":
+                return True
+            else:
+                print(f"{Fore.RED}Updating DB records failed{Fore.RESET}")
+                return False
+        except  requests.exceptions.RequestException as e:
+            print(f"{Fore.RED}Failed sending data to databse: {e}{Fore.RESET}")
+            return False
         
     def print_connection_error(self, error, message: str):              # Printing connection error message
         print(f"{Fore.RED}Failed connecting to a server\nError: {error}{Fore.RESET}")
@@ -103,7 +116,7 @@ class FetchData():
 
 
 class ValueInjector():
-    def __init__(self, dataObject: FetchData) -> None:
+    def __init__(self, dataObject: DataHandler) -> None:
         self.dataObject = dataObject
 
     
@@ -155,11 +168,16 @@ class ValueInjector():
             box_values = [list(column.values())[0] for column in rows]  # makes list from key-values of a few one-element lists
             return box_values
         
+        def insert_items(box: QComboBox):
+            box_values = make_list(box)
+            for value in box_values:                        # make_list returns list of 'value, value_id' so
+                split_id: list = value.split(',')           # this splits this string in list of [value, value_id]
+                value_text = split_id[0]                    # and inserts to QComboBox value and 'user_data' as value_id
+                value_id = int(split_id[1].strip())
+                box.addItem(value_text, userData=value_id)
 
         if isinstance(comboBox, tuple):
             for box in comboBox:
-                box_values = make_list(box)
-                box.addItems(box_values)
+                insert_items(box)
         elif isinstance(comboBox, QComboBox):
-            box_values = make_list(box)
-            box.addItems(box_values)
+            insert_items(comboBox)
