@@ -1,4 +1,4 @@
-# Form implementation generated from reading ui file 'c:\Users\oskar\OneDrive\Pulpit\Stuff\OSP-PANEL\ui\wyjazd_details.ui'
+# Form implementation generated from reading ui file 'c:\Users\Oskar\Desktop\Stuff\OSP-PANEL\ui\wyjazd_details.ui'
 #
 # Created by: PyQt6 UI code generator 6.7.1
 #
@@ -26,7 +26,8 @@ class Ui_Wyjazd_Details(object):
 "}\n"
 "\n"
 "QComboBox QAbstractItemView {\n"
-"        color: black;\n"
+"        color: black;  /* Kolor czcionki dla elementów rozwijanej listy */\n"
+"         /* Kolor tła dla elementów rozwijanej listy */\n"
 "    }\n"
 "\n"
 "QPushButton#closeBtn{\n"
@@ -489,7 +490,9 @@ class Ui_Wyjazd_Details(object):
         self.ratownik1Label.setText(_translate("Wyjazd_Details", "<html><head/><body><p align=\"center\"><span style=\" font-weight:600;\">Ratownik:</span></p></body></html>"))
         self.ratownik2Label.setText(_translate("Wyjazd_Details", "<html><head/><body><p align=\"center\"><span style=\" font-weight:600;\">Ratownik:</span></p></body></html>"))
         self.ratownik3Label.setText(_translate("Wyjazd_Details", "<html><head/><body><p align=\"center\"><span style=\" font-weight:600;\">Ratownik:</span></p></body></html>"))
+        self.ratownik3.setAccessibleName(_translate("Wyjazd_Details", "nullable"))
         self.ratownik4Label.setText(_translate("Wyjazd_Details", "<html><head/><body><p align=\"center\"><span style=\" font-weight:600;\">Ratownik:</span></p></body></html>"))
+        self.ratownik4.setAccessibleName(_translate("Wyjazd_Details", "nullable"))
         self.alarmLabel.setText(_translate("Wyjazd_Details", "<html><head/><body><p align=\"center\"><span style=\" font-weight:600;\">Alarm:</span></p></body></html>"))
         self.arrivalLabel.setText(_translate("Wyjazd_Details", "<html><head/><body><p align=\"center\"><span style=\" font-weight:600;\">Przyjazd:</span></p></body></html>"))
         self.departureLabel.setText(_translate("Wyjazd_Details", "<html><head/><body><p align=\"center\"><span style=\" font-weight:600;\">Odjazd:</span></p></body></html>"))

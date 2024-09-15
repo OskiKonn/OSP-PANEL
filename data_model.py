@@ -123,12 +123,18 @@ class ValueInjector():
     def inject_values(func):
         def wrapper(self, *args, **kwargs):
             values, fields = func(self, *args, **kwargs)    # Executes decorated function fill_data
+            print(values)
 
             for field in fields:                # Loops through widgets tuple and sets their values to data fetched from DB
                 if isinstance(field, tuple):
                     for comboBox in field:        # If it gets to tuple of comboBoxes, it loops through this nested tuple and sets setCurrentText
-                        field_value = values.get(comboBox.objectName()) 
-                        comboBox.setCurrentText(field_value)   
+                        field_value = values.get(comboBox.objectName())
+                        if field_value == None:
+                            item_index = 0
+                        else:
+                            item_index = comboBox.findText(field_value)
+                            
+                        comboBox.setCurrentIndex(item_index)
                 else:
                     if not isinstance(field, QLineEdit):
                         raise TypeError(f"{Fore.RED}Object is not QLineEdit or QComboBox{Fore.RESET}")
@@ -170,11 +176,16 @@ class ValueInjector():
         
         def insert_items(box: QComboBox):
             box_values = make_list(box)
+            if box.accessibleName() == "nullable":          # Adds 'Brak' item if corresponding db column is nullable
+                box.addItem("Brak", 0)
             for value in box_values:                        # make_list returns list of 'value, value_id' so
-                split_id: list = value.split(',')           # this splits this string in list of [value, value_id]
-                value_text = split_id[0]                    # and inserts to QComboBox value and 'user_data' as value_id
-                value_id = int(split_id[1].strip())
-                box.addItem(value_text, userData=value_id)
+                if "," in value:
+                    split_id: list = value.split(',')           # this splits this string in list of [value, value_id]
+                    value_text = split_id[0]                    # and inserts to QComboBox value and 'user_data' as value_id
+                    value_id = int(split_id[1].strip())
+                    box.addItem(value_text, userData=value_id)
+                else:
+                    box.addItem(value)
 
         if isinstance(comboBox, tuple):
             for box in comboBox:

@@ -6,7 +6,7 @@
     $connection = connect();
 
     if (!$connection) {
-        die("Error: Could not connect to a database" . pg_last_error());
+        die(json_encode(array('msg' => "Error: Could not connect to a database" . pg_last_error())));
     }
 
     $login = $_POST["login"];

@@ -10,9 +10,13 @@
     $i = 1;
 
     foreach ($_POST as $key => $value){
-        if ($key !== 'id') {      // If key doesn't contain id
+        if ($key !== 'id' && $key !== 'section') {      // If key doesn't contain id
             $updates[] = "$key = \$$i";
-            $values[] = $value;
+            if ($value === 'NULL') {
+                $values[] = NULL;
+            } else{
+                $values[] = $value;
+            }
             $i++;
         }
     }

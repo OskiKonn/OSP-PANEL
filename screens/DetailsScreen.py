@@ -21,33 +21,41 @@ class DetailsScreen(QWidget):
 
         self.injector = ValueInjector(self.dataObject)
         self.injector.populate_comboBox('czlonkowie', 'detail', self.combos)
-        self.initial_values: dict = self.get_current_values()
 
         if not self.empty:
             self.id = int(record_id)
             self.setWindowTitle(f"Wyjazd nr: {self.id}")
             self.injector.fill_data("wyjazdy", 'detail', self.edit_fields, self.id)
 
+        self.initial_values: dict = self.get_current_values()
+        print(self.ratownik3.accessibleName())
+
     # Catchinig current values from editable widgets
     def get_current_values(self) -> dict:
         current_data: dict = {'id' : self.id} if not self.empty else {}
-        print(current_data)
         # Loop for catching current data from QLineEdits
         for field in self.edit_fields:
             if isinstance(field, QLineEdit):
-                current_data[field.objectName()] = field.text()
+                if field.text() == "Brak":
+                  current_data[field.objectName()] = 'NULL'
+                else:  
+                    current_data[field.objectName()] = field.text()
 
         # Loop for catchig current data from QComboBoxes
         for comboBox in self.combos:
-            item_index = comboBox.findText(comboBox.currentText())
+            item_index = comboBox.currentIndex()
             item_id = comboBox.itemData(item_index)
-            current_data[comboBox.objectName()] = item_id
+            if item_index != -1 and item_id == 0:
+                current_data[comboBox.objectName()] = 'NULL'
+            elif item_index != -1 and item_id != 0:
+                current_data[comboBox.objectName()] = item_id
+            else:
+                current_data[comboBox.objectName()] = comboBox.currentText()
 
         return current_data
     
     def check_for_unsaved_changes(self) -> None:
         current_values = self.get_current_values()
-        print(current_values)
         unsaved: bool = not (current_values == self.initial_values)
         if not unsaved:
             self.close()

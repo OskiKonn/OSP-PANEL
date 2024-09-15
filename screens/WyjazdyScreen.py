@@ -34,6 +34,6 @@ class WyjazdyScreen(QMainWindow):
 
     def showDetails(self, index) -> None:
         id = self.model.returnId(index.row())
-        wyjazd_details = DetailsScreen(self.app_state, empty=True)
+        wyjazd_details = DetailsScreen(self.app_state, id)
         self.detail_windows.append(wyjazd_details)      # Pushes widget to a list of active widgets
         wyjazd_details.show()                           # makes it possible to have more than one opened

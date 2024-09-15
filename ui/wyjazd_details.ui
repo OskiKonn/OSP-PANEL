@@ -681,6 +681,9 @@ QPushButton#closeBtn{
            <property name="focusPolicy">
             <enum>Qt::NoFocus</enum>
            </property>
+           <property name="accessibleName">
+            <string>nullable</string>
+           </property>
            <property name="styleSheet">
             <string notr="true">background:white</string>
            </property>
@@ -735,6 +738,9 @@ QPushButton#closeBtn{
            </property>
            <property name="focusPolicy">
             <enum>Qt::NoFocus</enum>
+           </property>
+           <property name="accessibleName">
+            <string>nullable</string>
            </property>
            <property name="styleSheet">
             <string notr="true">background:white;</string>
