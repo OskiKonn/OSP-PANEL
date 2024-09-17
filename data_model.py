@@ -41,6 +41,12 @@ class TableModel(QAbstractTableModel):
     def returnId(self, index: int) -> int:
         id_index = len(self._data[0]) - 1      # Always importing id as last value in a row
         return self.table[index][id_index]
+    
+    def refresh(self, new_data: dict) -> None:
+        self.beginResetModel()
+        self._data = new_data
+        self.table = self.createTable()
+        self.endResetModel()
 
 
 class DataHandler():
@@ -123,7 +129,6 @@ class ValueInjector():
     def inject_values(func):
         def wrapper(self, *args, **kwargs):
             values, fields = func(self, *args, **kwargs)    # Executes decorated function fill_data
-            print(values)
 
             for field in fields:                # Loops through widgets tuple and sets their values to data fetched from DB
                 if isinstance(field, tuple):

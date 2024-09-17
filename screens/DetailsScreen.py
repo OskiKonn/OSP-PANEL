@@ -1,34 +1,19 @@
 from data_model import ValueInjector
 from PyQt6.QtWidgets import QWidget, QLineEdit, QMessageBox
-from PyQt6.QtCore import QSize
+from PyQt6.QtCore import QSize, pyqtSignal
 
 class DetailsScreen(QWidget):
-    def __init__(self, appState, record_id: int | None = None, empty: bool = False):
+    record_added = pyqtSignal()
+    def __init__(self, appState, record_id: int | None = None, empty: bool = False, dbTable: str | None = None):
         super(DetailsScreen, self).__init__()
         self.app_state = appState
         self.dataObject = self.app_state.dataObject
         self.empty = empty
-        self.ui = "ui/wyjazd_details.ui"
-        self.app_state.loadUI(self.ui, self, QSize(800, 700))
+        self.dbTable = dbTable
+        self.injector = ValueInjector(self.dataObject)
+        self.app_state.loadUI(self.ui, self, QSize(800, 700))    
         self.closeBtn.clicked.connect(self.check_for_unsaved_changes)
         self.saveBtn.clicked.connect(lambda: self.save())
-        self.combos = (self.commander, self.driver, self.ratownik1, self.ratownik2,
-                       self.ratownik3, self.ratownik4)
-        
-        self.edit_fields = (self.title, self.number, self.day, self.type, self.adress,  # Fields with NO combo boxes!!!
-                            self.alarm, self.arrival, self.departure, self.comeback,
-                            self.combos)        
-
-        self.injector = ValueInjector(self.dataObject)
-        self.injector.populate_comboBox('czlonkowie', 'detail', self.combos)
-
-        if not self.empty:
-            self.id = int(record_id)
-            self.setWindowTitle(f"Wyjazd nr: {self.id}")
-            self.injector.fill_data("wyjazdy", 'detail', self.edit_fields, self.id)
-
-        self.initial_values: dict = self.get_current_values()
-        print(self.ratownik3.accessibleName())
 
     # Catchinig current values from editable widgets
     def get_current_values(self) -> dict:
@@ -63,6 +48,7 @@ class DetailsScreen(QWidget):
             confirmation = self.confirm_changes()
             if confirmation == "Yes":
                 self.save(current_values)
+                self.close()
             elif confirmation == "No":
                 self.close()
     
@@ -78,11 +64,12 @@ class DetailsScreen(QWidget):
         else:
             return "Cancel"
         
+    # Default function for saving data to DB
     def save(self, current_values: dict | None = None) -> None:
         if current_values == None:
             current_values = self.get_current_values()
         current_values['id'] = self.id     # self.id returned previously by PyQt6 index system is a string somehow
-        update: bool = self.dataObject.send_to_db("wyjazdy", current_values)
+        update: bool = self.dataObject.send_to_db(self.dbTable, current_values)
         if update:
             print("Update succesfull")
             current_values.pop('section')           # pops 'section' key added in data_model.send_to_db
@@ -100,3 +87,56 @@ class DetailsScreen(QWidget):
                 event.accept()
             else:
                 event.ignore()
+
+
+class DetailsWyjazdy(DetailsScreen):
+    def __init__(self, appState, record_id: int | None = None, empty: bool = False):
+        self.ui = "ui/wyjazd_details.ui"
+        super().__init__(appState, record_id, empty)
+        self.combos = (self.commander, self.driver, self.ratownik1, self.ratownik2,
+                       self.ratownik3, self.ratownik4)
+        
+        self.edit_fields = (self.title, self.number, self.day, self.type, self.adress,  # Fields with NO combo boxes!!!
+                            self.alarm, self.arrival, self.departure, self.comeback,
+                            self.combos)
+        
+        self.injector.populate_comboBox('czlonkowie', 'detail', self.combos)
+        
+        if not self.empty:
+            self.id = int(record_id)
+            self.setWindowTitle(f"Wyjazd nr: {self.id}")
+            self.injector.fill_data("wyjazdy", 'detail', self.edit_fields, self.id)
+
+        self.initial_values: dict = self.get_current_values()
+
+    def unique_fighters(self) -> bool:
+        '''People cannot duplicate so a fighter can be assigned to only one role in single wyjazd.
+           This checks if fighetr is not assigned to multiple roles'''
+        fighters: list[int] = []
+        for fighter in self.combos:
+            fighter_id = fighter.itemData(fighter.currentIndex())
+            if fighter_id in fighters:
+                return False
+            else:
+                fighters.append(fighter_id)
+
+        return True
+
+    def save(self, current_values: dict | None = None) -> None:
+        if not self.unique_fighters():
+            str = "Jeden lub więcej ratowników jest przypisany do różnych ról\n\nDokonaj niezbędnych zmian i kontynuuj"
+            box = QMessageBox.information(self, "Duplikowanie ratowników", str, QMessageBox.StandardButton.Ok)
+        else:
+            if current_values == None:
+                current_values = self.get_current_values()
+            if self.id:
+                current_values['id'] = self.id     # self.id returned previously by PyQt6 index system is a string somehow
+            update: bool = self.dataObject.send_to_db("wyjazdy", current_values)
+            if update:
+                print("Update succesfull")
+                current_values.pop('section')           # pops 'section' key added in data_model.send_to_db
+                self.initial_values = current_values    # to ensure proper get_current_values functionality
+                if self.empty:
+                    self.record_added.emit()
+            else:
+                print("Update failed")
