@@ -69,13 +69,10 @@ class DetailsScreen(QWidget):
         if current_values == None:
             current_values = self.get_current_values()
         current_values['id'] = self.id     # self.id returned previously by PyQt6 index system is a string somehow
-        update: bool = self.dataObject.send_to_db(self.dbTable, current_values)
+        update: bool = self.dataObject.query_db(self.dbTable, current_values, "update")
         if update:
-            print("Update succesfull")
-            current_values.pop('section')           # pops 'section' key added in data_model.send_to_db
+            current_values.pop('section')           # pops 'section' key added in data_model.query_to_db
             self.initial_values = current_values    # to ensure proper get_current_values functionality
-        else:
-            print("Update failed")
 
     # Overriding closeEvent method
     def closeEvent(self, event):
@@ -122,6 +119,7 @@ class DetailsWyjazdy(DetailsScreen):
 
         return True
 
+    # Overriding defaul save function in DetailsScreen class
     def save(self, current_values: dict | None = None) -> None:
         if not self.unique_fighters():
             str = "Jeden lub więcej ratowników jest przypisany do różnych ról\n\nDokonaj niezbędnych zmian i kontynuuj"
@@ -129,14 +127,19 @@ class DetailsWyjazdy(DetailsScreen):
         else:
             if current_values == None:
                 current_values = self.get_current_values()
-            if self.id:
-                current_values['id'] = self.id     # self.id returned previously by PyQt6 index system is a string somehow
-            update: bool = self.dataObject.send_to_db("wyjazdy", current_values)
+
+            if hasattr(self, "id"):
+                current_values['id'] = self.id     
+
+            if not self.empty:
+                update: bool = self.dataObject.query_db("wyjazdy", current_values, "update")
+            else:
+                update: bool = self.dataObject.query_db("wyjazdy", current_values, "insert")
+
             if update:
-                print("Update succesfull")
-                current_values.pop('section')           # pops 'section' key added in data_model.send_to_db
-                self.initial_values = current_values    # to ensure proper get_current_values functionality
+                current_values.pop('section')           
+                self.initial_values = current_values
+
                 if self.empty:
                     self.record_added.emit()
-            else:
-                print("Update failed")
+                    self.close()

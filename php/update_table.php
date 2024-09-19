@@ -32,7 +32,7 @@
             die("Update failed: " . pg_last_error());
         }
 
-        echo "Update successful";
+        echo "Query successful";
     }
 
     pg_close($connection);

@@ -102,15 +102,23 @@ class DataHandler():
             print(f"{Fore.RED}Error: {e}{Fore.RESET}")
             return False, "Exception"
         
-    def send_to_db(self, section: str, data: dict) -> bool:
-        scrtipt_name = "update_table.php"
+    def query_db(self, section: str, data: dict, action: Literal["update", "insert", "delete"]) -> bool:
+
+        if action == "update":
+            scrtipt_name = "update_table.php"
+        elif action == "insert":
+            scrtipt_name = "insert.php"
+        elif action == "delete":
+            scrtipt_name = "delete.php"
+
         data['section'] = section
+
         try:
             response = self.connect(scrtipt_name, post=data, no_JSON=True)
-            if response.strip() == "Update successful":
+            if response.strip() == "Query successfull":
                 return True
             else:
-                print(f"{Fore.RED}Updating DB records failed{Fore.RESET}")
+                print(f"{Fore.RED}{response}{Fore.RESET}")
                 return False
         except  requests.exceptions.RequestException as e:
             print(f"{Fore.RED}Failed sending data to databse: {e}{Fore.RESET}")

@@ -39,9 +39,10 @@ class WyjazdyScreen(QMainWindow):
         details.show()                           # makes it possible to have more than one opened
 
     def add_record(self) -> None:
-        def update_data(self) -> None:
+        def update_data() -> None:
             _, new_data = self.dataObject.fetch_table_data("wyjazdy")
             self.model.refresh(new_data)
+            
         new_record = DetailsWyjazdy(self.app_state, empty=True)
         new_record.record_added.connect(update_data)
         new_record.show()
