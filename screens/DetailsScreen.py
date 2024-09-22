@@ -1,25 +1,38 @@
 from data_model import ValueInjector
 from PyQt6.QtWidgets import QWidget, QLineEdit, QMessageBox
-from PyQt6.QtCore import QSize, pyqtSignal
+from PyQt6.QtCore import QSize
 
 class DetailsScreen(QWidget):
-    record_added = pyqtSignal()
-    def __init__(self, appState, record_id: int | None = None, empty: bool = False, dbTable: str | None = None):
+    def __init__(self, appState, parent, record_id: int | None = None, empty: bool = False, dbTable: str | None = None):
         super(DetailsScreen, self).__init__()
         self.app_state = appState
+        self.parent = parent
         self.dataObject = self.app_state.dataObject
         self.empty = empty
-        self.dbTable = dbTable
         self.injector = ValueInjector(self.dataObject)
         self.app_state.loadUI(self.ui, self, QSize(800, 700))    
         self.closeBtn.clicked.connect(self.check_for_unsaved_changes)
         self.saveBtn.clicked.connect(lambda: self.save())
 
+        if dbTable is not None:
+            self.dbTable = dbTable
+
+        if self.empty:
+            self.saveBtn.setText("Dodaj")
+
+    # Connecting slots for enabling save button 
+    def connect_slots(self) -> None:
+        for box in self.combos:
+            box.currentIndexChanged.connect(self.enable_saveBtn)
+        
+        for field in self.text_fields:
+            field.textEdited.connect(self.enable_saveBtn)
+
     # Catchinig current values from editable widgets
     def get_current_values(self) -> dict:
         current_data: dict = {'id' : self.id} if not self.empty else {}
         # Loop for catching current data from QLineEdits
-        for field in self.edit_fields:
+        for field in self.text_fields:
             if isinstance(field, QLineEdit):
                 if field.text() == "Brak":
                   current_data[field.objectName()] = 'NULL'
@@ -48,7 +61,7 @@ class DetailsScreen(QWidget):
             confirmation = self.confirm_changes()
             if confirmation == "Yes":
                 self.save(current_values)
-                self.close()
+                #self.close()
             elif confirmation == "No":
                 self.close()
     
@@ -68,11 +81,17 @@ class DetailsScreen(QWidget):
     def save(self, current_values: dict | None = None) -> None:
         if current_values == None:
             current_values = self.get_current_values()
-        current_values['id'] = self.id     # self.id returned previously by PyQt6 index system is a string somehow
-        update: bool = self.dataObject.query_db(self.dbTable, current_values, "update")
-        if update:
+
+        if hasattr(self, "id"):
+            current_values['id'] = self.id     # self.id returned previously by PyQt6 index system is a string somehow
+
+        saved: bool = self.dataObject.query_db(self.dbTable, current_values, "update")
+
+        if saved:
             current_values.pop('section')           # pops 'section' key added in data_model.query_to_db
+            self.disable_saveBtn()
             self.initial_values = current_values    # to ensure proper get_current_values functionality
+            self.refresh_data_model()
 
     # Overriding closeEvent method
     def closeEvent(self, event):
@@ -85,26 +104,38 @@ class DetailsScreen(QWidget):
             else:
                 event.ignore()
 
+    def refresh_data_model(self) -> None:
+        _, new_data = self.dataObject.fetch_table_data(self.dbTable)
+        self.parent.model.refresh(new_data)
+
+    def enable_saveBtn(self) -> None:
+        if not self.saveBtn.isEnabled():
+            self.saveBtn.setEnabled(True)
+            self.saveBtn.setStyleSheet("background:red")
+    
+    def disable_saveBtn(self) -> None:
+        self.saveBtn.setEnabled(False)
+        self.saveBtn.setStyleSheet("background: #bd979a")
 
 class DetailsWyjazdy(DetailsScreen):
-    def __init__(self, appState, record_id: int | None = None, empty: bool = False):
+    def __init__(self, appState, parent, record_id: int | None = None, empty: bool = False):
         self.ui = "ui/wyjazd_details.ui"
-        super().__init__(appState, record_id, empty)
+        super().__init__(appState, parent, record_id, empty)
         self.combos = (self.commander, self.driver, self.ratownik1, self.ratownik2,
                        self.ratownik3, self.ratownik4)
         
-        self.edit_fields = (self.title, self.number, self.day, self.type, self.adress,  # Fields with NO combo boxes!!!
-                            self.alarm, self.arrival, self.departure, self.comeback,
-                            self.combos)
+        self.text_fields = (self.title, self.number, self.day, self.type, self.adress,  # Fields with NO combo boxes!!!
+                            self.alarm, self.arrival, self.departure, self.comeback)
         
         self.injector.populate_comboBox('czlonkowie', 'detail', self.combos)
         
         if not self.empty:
             self.id = int(record_id)
-            self.setWindowTitle(f"Wyjazd nr: {self.id}")
-            self.injector.fill_data("wyjazdy", 'detail', self.edit_fields, self.id)
+            self.setWindowTitle(f"Wyjazd nr: {self.number.text()}")
+            self.injector.fill_data("wyjazdy", 'detail', self.text_fields, self.combos, self.id)
 
         self.initial_values: dict = self.get_current_values()
+        self.connect_slots()
 
     def unique_fighters(self) -> bool:
         '''People cannot duplicate so a fighter can be assigned to only one role in single wyjazd.
@@ -122,8 +153,8 @@ class DetailsWyjazdy(DetailsScreen):
     # Overriding defaul save function in DetailsScreen class
     def save(self, current_values: dict | None = None) -> None:
         if not self.unique_fighters():
-            str = "Jeden lub więcej ratowników jest przypisany do różnych ról\n\nDokonaj niezbędnych zmian i kontynuuj"
-            box = QMessageBox.information(self, "Duplikowanie ratowników", str, QMessageBox.StandardButton.Ok)
+            msg = "Jeden lub więcej ratowników jest przypisany do różnych ról\n\nDokonaj niezbędnych zmian i kontynuuj"
+            box = QMessageBox.information(self, "Duplikowanie ratowników", msg, QMessageBox.StandardButton.Ok)
         else:
             if current_values == None:
                 current_values = self.get_current_values()
@@ -132,14 +163,18 @@ class DetailsWyjazdy(DetailsScreen):
                 current_values['id'] = self.id     
 
             if not self.empty:
-                update: bool = self.dataObject.query_db("wyjazdy", current_values, "update")
+                saved: bool = self.dataObject.query_db("wyjazdy", current_values, "update")
             else:
-                update: bool = self.dataObject.query_db("wyjazdy", current_values, "insert")
+                saved: bool = self.dataObject.query_db("wyjazdy", current_values, "insert")
 
-            if update:
-                current_values.pop('section')           
+            if saved:
+                current_values.pop('section')
+                self.disable_saveBtn()           
                 self.initial_values = current_values
+                self.refresh_data_model()
+                
+                if self.empty : self.close()
 
-                if self.empty:
-                    self.record_added.emit()
-                    self.close()
+    def refresh_data_model(self) -> None:
+        _, new_data = self.dataObject.fetch_table_data("wyjazdy")
+        self.parent.model.refresh(new_data)

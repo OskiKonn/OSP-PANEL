@@ -1010,6 +1010,9 @@ QPushButton#closeBtn{
          </item>
          <item>
           <widget class="QPushButton" name="saveBtn">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
            <property name="focusPolicy">
             <enum>Qt::ClickFocus</enum>
            </property>
@@ -1017,7 +1020,7 @@ QPushButton#closeBtn{
             <bool>false</bool>
            </property>
            <property name="styleSheet">
-            <string notr="true">background:red</string>
+            <string notr="true">background:#bd979a</string>
            </property>
            <property name="text">
             <string>Zapisz</string>

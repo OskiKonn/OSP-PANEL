@@ -3,14 +3,12 @@ from colorama import Fore
 from data_model import TableModel
 from screens.DetailsScreen import DetailsWyjazdy
 
-class WyjazdyScreen(QMainWindow):
+class RecordsScreen(QMainWindow):
     def __init__(self, appState, parent=None):
-        super(WyjazdyScreen, self).__init__()
-            
+        super(RecordsScreen, self).__init__()        
         self.app_state = appState
         self.dataObject = self.app_state.dataObject
         self.father = parent
-        self.ui = "ui/wyjazdy.ui"
         self.app_state.loadUI(self.ui, self)
         self.initialized: bool = False
         self.add.clicked.connect(self.add_record)
@@ -35,14 +33,14 @@ class WyjazdyScreen(QMainWindow):
 
     def showDetails(self, index) -> None:
         id = self.model.returnId(index.row())
-        details = DetailsWyjazdy(self.app_state, id)
-        details.show()                           # makes it possible to have more than one opened
+        details = DetailsWyjazdy(self.app_state, self, id)
+        details.show()
 
-    def add_record(self) -> None:
-        def update_data() -> None:
-            _, new_data = self.dataObject.fetch_table_data("wyjazdy")
-            self.model.refresh(new_data)
-            
-        new_record = DetailsWyjazdy(self.app_state, empty=True)
-        new_record.record_added.connect(update_data)
+class WyjazdyScreen(RecordsScreen):
+    def __init__(self, appState, parent=None):
+        self.ui = "ui/wyjazdy.ui"
+        super().__init__(appState, parent)
+
+    def add_record(self) -> None:     
+        new_record = DetailsWyjazdy(self.app_state, self, empty=True)
         new_record.show()

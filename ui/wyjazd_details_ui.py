@@ -1,4 +1,4 @@
-# Form implementation generated from reading ui file 'c:\Users\Oskar\Desktop\Stuff\OSP-PANEL\ui\wyjazd_details.ui'
+# Form implementation generated from reading ui file 'c:\Users\oskar\Desktop\Stuff\OSP-PANEL\ui\wyjazd_details.ui'
 #
 # Created by: PyQt6 UI code generator 6.7.1
 #
@@ -456,9 +456,10 @@ class Ui_Wyjazd_Details(object):
         spacerItem12 = QtWidgets.QSpacerItem(292, 20, QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Minimum)
         self.horizontalLayout_7.addItem(spacerItem12)
         self.saveBtn = QtWidgets.QPushButton(parent=self.buttons)
+        self.saveBtn.setEnabled(False)
         self.saveBtn.setFocusPolicy(QtCore.Qt.FocusPolicy.ClickFocus)
         self.saveBtn.setAutoFillBackground(False)
-        self.saveBtn.setStyleSheet("background:red")
+        self.saveBtn.setStyleSheet("background:#bd979a")
         self.saveBtn.setDefault(False)
         self.saveBtn.setFlat(False)
         self.saveBtn.setObjectName("saveBtn")

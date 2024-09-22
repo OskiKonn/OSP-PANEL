@@ -3,7 +3,7 @@ import requests
 from PyQt6.QtCore import QAbstractTableModel ,Qt
 from PyQt6.QtWidgets import QLineEdit, QComboBox
 from colorama import Fore
-from typing import Literal
+from typing import Literal, Optional, Tuple
 
 class TableModel(QAbstractTableModel):
     def __init__(self, data: dict, cut_id: bool = False):
@@ -136,33 +136,34 @@ class ValueInjector():
     
     def inject_values(func):
         def wrapper(self, *args, **kwargs):
-            values, fields = func(self, *args, **kwargs)    # Executes decorated function fill_data
+            values, lineEdits, comboBoxes = func(self, *args, **kwargs)    # Executes decorated function fill_data
 
-            for field in fields:                # Loops through widgets tuple and sets their values to data fetched from DB
-                if isinstance(field, tuple):
-                    for comboBox in field:        # If it gets to tuple of comboBoxes, it loops through this nested tuple and sets setCurrentText
-                        field_value = values.get(comboBox.objectName())
-                        if field_value == None:
-                            item_index = 0
-                        else:
-                            item_index = comboBox.findText(field_value)
-                            
-                        comboBox.setCurrentIndex(item_index)
+            for line in lineEdits:                # Loops through widgets tuple and sets their values to data fetched from DB
+                line_value = values.get(line.objectName())    # Looks for key name corresponding to objectName in db data and assings value
+                line.setText(line_value)
+
+            for box in comboBoxes:
+                box_value = values.get(box.objectName())
+                if box_value == None:
+                    item_index = 0
                 else:
-                    if not isinstance(field, QLineEdit):
-                        raise TypeError(f"{Fore.RED}Object is not QLineEdit or QComboBox{Fore.RESET}")
-                    field_value = values.get(field.objectName())    # Looks for key name corresponding to objectName in db data and assings value
-                    field.setText(field_value)
-                      
+                    item_index = box.findText(box_value)
+                    
+                box.setCurrentIndex(item_index)
                 
         return wrapper    
     
     @inject_values      # Decorator for injecting values ("calls both functions")
-    def fill_data(self, db_table: str, mode: Literal['detail', 'short'], editFields: tuple, id: int = None) -> dict | tuple:
+    def fill_data(self, db_table: str, mode: Literal['detail', 'short'], lineEdits: Optional[Tuple[QLineEdit, ...]],
+                   comboBoxes: Optional[Tuple[QComboBox, ...]], id: int = None) -> dict | tuple:
         '''
         Takes name of database table and puts this data into editFields widgets. ID is optional
         if function should return specified row of passed ID in database. Doesn't add items to QComboBox
         '''
+
+        if lineEdits is None and comboBoxes is None:
+            raise ValueError()
+
         fetch_OK, table_data = self.dataObject.fetch_table_data(db_table, mode, id)   # Returns if fetch succesfull and table_data [list/dict]
         if not fetch_OK:
             print(f"{Fore.RED}Failed loading detailed data{Fore.RESET}")
@@ -171,7 +172,7 @@ class ValueInjector():
         if isinstance(table_data, list):
             table_data: dict = table_data[0]            # table_data is a one-element list returned from a function
                                                         # so we have to take out the dict from it
-        return table_data, editFields
+        return table_data, lineEdits, comboBoxes
     
 
     def populate_comboBox(self, db_table: str, mode: Literal['detail', 'short'], comboBox: QComboBox | tuple):
