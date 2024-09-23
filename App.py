@@ -1,22 +1,21 @@
 import sys
-import requests
 from PyQt6 import uic
-from PyQt6.QtWidgets import QApplication, QStackedWidget, QMainWindow, QWidget, QLineEdit, QComboBox
+from PyQt6.QtWidgets import QApplication, QStackedWidget, QMainWindow, QWidget
 from PyQt6.QtCore import QSize
 from colorama import Fore, init # color prints module
-from typing import Literal
 # Import data_model classes
-from data_model import DataHandler, TableModel, ValueInjector
+from data_model import DataHandler
 # Importing Screens modules
 from screens.MainScreen import MainScreen
 from screens.HomeScreen import HomeScreen
-from screens.WyjazdyScreen import WyjazdyScreen
+from screens.RecordsScreen import RecordsScreen
 
 
 class AppState(QMainWindow):
     def __init__(self):
         super(AppState, self).__init__()
         print(f"{Fore.GREEN}AppState loaded{Fore.RESET}")
+        self.setWindowTitle("OSP PANEL")
 
         # Creating data-fetching object
         self.dataObject = DataHandler("http://localhost")
@@ -24,7 +23,7 @@ class AppState(QMainWindow):
         # Initializing Widgets
         self.MainScreen = MainScreen(self)
         self.HomeScreen = HomeScreen(self)
-        self.WyjazdyScreen = WyjazdyScreen(self, self.HomeScreen)
+        self.WyjazdyScreen = RecordsScreen(self, "wyjazdy", self.HomeScreen)
 
         # Adding widgets to stack
         self.screens = QStackedWidget()

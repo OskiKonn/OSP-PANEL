@@ -131,8 +131,8 @@ class DetailsWyjazdy(DetailsScreen):
         
         if not self.empty:
             self.id = int(record_id)
-            self.setWindowTitle(f"Wyjazd nr: {self.number.text()}")
             self.injector.fill_data("wyjazdy", 'detail', self.text_fields, self.combos, self.id)
+            self.setWindowTitle(f"Wyjazd nr: {self.number.text()}")
 
         self.initial_values: dict = self.get_current_values()
         self.connect_slots()
