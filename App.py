@@ -23,13 +23,13 @@ class AppState(QMainWindow):
         # Initializing Widgets
         self.MainScreen = MainScreen(self)
         self.HomeScreen = HomeScreen(self)
-        self.WyjazdyScreen = RecordsScreen(self, "wyjazdy", self.HomeScreen)
+        self.RecordsScreen = RecordsScreen(self, "wyjazdy", self.HomeScreen)
 
         # Adding widgets to stack
         self.screens = QStackedWidget()
         self.screens.addWidget(self.MainScreen)
         self.screens.addWidget(self.HomeScreen)
-        self.screens.addWidget(self.WyjazdyScreen)
+        self.screens.addWidget(self.RecordsScreen)
         print(f"{Fore.YELLOW}Stack loaded succesfully{Fore.RESET}")
         self.loadWidget(self.MainScreen)
 

@@ -11,15 +11,15 @@ class RecordsScreen(QMainWindow):
         "czlonkowie" : DetailsWyjazdy
     }
 
-    def __init__(self, appState, section: Literal["wyjazdy", "czlonkowie", "wyposazenie", "dokumenty"], parent=None):
+    def __init__(self, app, section: Literal["wyjazdy", "czlonkowie", "wyposazenie", "dokumenty"], parent=None):
         super(RecordsScreen, self).__init__()        
-        self.app_state = appState
+        self.app = app
         self.section = section
         if parent is not None:
             self.father = parent
 
-        self.dataObject = self.app_state.dataObject
-        self.app_state.loadUI("ui/records.ui", self)
+        self.dataObject = self.app.dataObject
+        self.app.loadUI("ui/records.ui", self)
         self.initialized: bool = False
         self.title.setText(self.section.upper())
         self.add.clicked.connect(self.add_record)
@@ -41,17 +41,17 @@ class RecordsScreen(QMainWindow):
                 self.list.doubleClicked.connect(self.showDetails)
                 self.initialized = True
 
-            self.app_state.loadWidget(self.app_state.WyjazdyScreen)
+            self.app.loadWidget(self.app.RecordsScreen)
 
     def showDetails(self, index) -> None:
         id = self.model.returnId(index.row())
         screen : QMainWindow = self.get_details_screen
-        details = screen(self.app_state, self, id)
+        details = screen(self.app, self, id)
         details.show()
 
     def add_record(self) -> None:
         screen: QMainWindow = self.get_details_screen
-        new_record = screen(self.app_state, self, empty=True)
+        new_record = screen(self.app, self, empty=True)
         new_record.show()
     
     @property

@@ -3,13 +3,13 @@ from PyQt6.QtCore import QSize
 from colorama import Fore
 
 class MainScreen(qtw.QMainWindow):
-    def __init__(self, appState):
+    def __init__(self, app):
         super(MainScreen, self).__init__()
         self.setWindowTitle("OSP PANEL")
-        self.app_state = appState        # Connecting AppState class to a window
-        self.dataObject = self.app_state.dataObject
+        self.app = app        # Connecting AppState class to a window
+        self.dataObject = self.app.dataObject
         self.ui = "ui/login.ui"
-        self.app_state.loadUI(self.ui, self, QSize(870, 543))
+        self.app.loadUI(self.ui, self, QSize(870, 543))
         self.submit.clicked.connect(self.logIN)
 
     def logIN(self) -> None:
@@ -19,7 +19,7 @@ class MainScreen(qtw.QMainWindow):
         login_OK = self.dataObject.verify_user(login, password)
 
         if login_OK or login == '':
-            self.app_state.loadWidget(self.app_state.HomeScreen)
+            self.app.loadWidget(self.app.HomeScreen)
         else:
             self.create_messageBox()
 

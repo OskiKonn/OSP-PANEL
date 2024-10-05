@@ -3,14 +3,14 @@ from PyQt6.QtWidgets import QWidget, QLineEdit, QMessageBox
 from PyQt6.QtCore import QSize
 
 class DetailsScreen(QWidget):
-    def __init__(self, appState, parent, record_id: int | None = None, empty: bool = False, dbTable: str | None = None):
+    def __init__(self, app, parent, record_id: int | None = None, empty: bool = False, dbTable: str | None = None):
         super(DetailsScreen, self).__init__()
-        self.app_state = appState
+        self.app = app
         self.parent = parent
-        self.dataObject = self.app_state.dataObject
+        self.dataObject = self.app.dataObject
         self.empty = empty
         self.injector = ValueInjector(self.dataObject)
-        self.app_state.loadUI(self.ui, self, QSize(800, 700))    
+        self.app.loadUI(self.ui, self, QSize(800, 700))    
         self.closeBtn.clicked.connect(self.check_for_unsaved_changes)
         self.saveBtn.clicked.connect(lambda: self.save())
 
